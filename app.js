@@ -204,50 +204,73 @@ function renderGlitches(){
 }
 
 function completion(){
- let standardDone=0,bosses=0,warps=0,bandages=0,aplusLight=0,aplusDark=0;
+ let lightDone=0,darkDone=0,bosses=0,warpZones=0,bandages=0,aplusLight=0,aplusDark=0;
  worlds.forEach(function(w,wi){
    for(let i=1;i<=w.light;i++){
-     if(isDone(K("level",wi+"-light-"+i)))standardDone++;
+     if(isDone(K("level",wi+"-light-"+i)))lightDone++;
      if(isDone(K("aplus",wi+"-light-"+i)))aplusLight++;
    }
    for(let i=1;i<=w.dark;i++){
-     if(isDone(K("level",wi+"-dark-"+i)))standardDone++;
+     if(isDone(K("level",wi+"-dark-"+i)))darkDone++;
      if(isDone(K("aplus",wi+"-dark-"+i)))aplusDark++;
    }
    if(w.boss && isDone(K("boss",wi)))bosses++;
    if(w.bossLight || w.bossDark){
-     const lightDone=isDone(K("boss",wi+"-light")), darkDone=isDone(K("boss",wi+"-dark"));
-     if(lightDone && darkDone)bosses++;
+     if(isDone(K("boss",wi+"-light")))bosses++;
+     if(isDone(K("boss",wi+"-dark")))bosses++;
    }
-   (warpMap[wi]||[]).forEach(function(_,n){if(isDone(K("warp",wi+"-"+n)))warps++;});
+   (warpMap[wi]||[]).forEach(function(_,n){if(isDone(K("warp",wi+"-"+n)))warpZones++;});
    (bandageMap[wi]||[]).forEach(function(_,n){if(isDone(K("bandage",wi+"-"+n)))bandages++;});
  });
  let glitches=0;
  for(let i=1;i<=6;i++)if(isDone(K("glitch",i)))glitches++;
 
- // Game-style completion weights:
- // 250 standard Light/Dark levels = 80%
- // 20 Warp Zones = 10%
- // 6 chapter bosses = 6%
- // 100 bandages = 4%
- // 6 glitch levels = +6% extra
- // A+ ranks do NOT directly add completion; Light A+ unlocks Dark World access.
- const base=(standardDone/250)*80+(warps/20)*10+(bosses/6)*6+(bandages/100)*4;
- const total=Math.min(106,base+glitches);
- return{total:total,standardDone:standardDone,bandages:bandages,warps:warps,bosses:bosses,glitches:glitches,aplusLight:aplusLight,aplusDark:aplusDark};
+ // Exact tracker formula supplied by the user:
+ // 120 Light + 120 Dark + 6 Boss + 30 Warp Zone Levels + 100 Bandages = 376 base points.
+ // Glitch levels are bonus points and can raise the displayed percentage above 100%.
+ const lightPoints=Math.min(120,lightDone);
+ const darkPoints=Math.min(120,darkDone);
+ const bossPoints=Math.min(6,bosses);
+ // The current UI has 20 Warp Zone entries; those entries represent the 30
+ // completion points assigned to Warp Zone Levels in the requested formula.
+ const warpPoints=Math.min(30,warpZones*1.5);
+ const bandagePoints=Math.min(100,bandages);
+ const bonusPoints=glitches;
+ const basePoints=lightPoints+darkPoints+bossPoints+warpPoints+bandagePoints;
+ const totalPoints=basePoints+bonusPoints;
+ const total=totalPoints/376*100;
+ return{
+   total:total,
+   totalPoints:totalPoints,
+   basePoints:basePoints,
+   lightPoints:lightPoints,
+   darkPoints:darkPoints,
+   bossPoints:bossPoints,
+   warpPoints:warpPoints,
+   bandagePoints:bandagePoints,
+   bonusPoints:bonusPoints,
+   standardDone:lightDone+darkDone,
+   lightDone:lightDone,
+   darkDone:darkDone,
+   bandages:bandages,
+   warps:warpZones,
+   bosses:bosses,
+   glitches:glitches,
+   aplusLight:aplusLight,
+   aplusDark:aplusDark
+ };
 }
-
 function renderAll(){
  renderWorlds();renderGlitches();renderCharacters();
  const p=completion();
  document.getElementById("completion").textContent=p.total.toFixed(1).replace(/\.0$/,"")+"%";
  document.querySelector(".completion-ring").style.setProperty("--pct",p.total);
- document.getElementById("overallBar").style.width=(p.total/106*100)+"%";
- document.getElementById("completedPoints").textContent=p.total.toFixed(1).replace(/\.0$/,"")+" / 106%";
+ document.getElementById("overallBar").style.width=Math.min(100,p.total)+"%";
+ document.getElementById("completedPoints").textContent=p.totalPoints.toFixed(1).replace(/\.0$/,"")+" / 376 base points";
  document.getElementById("levelsDone").textContent=p.standardDone;
  document.getElementById("bandagesDone").textContent=p.bandages;
  document.getElementById("aPlusDone").textContent=p.aplusLight;
- document.getElementById("completionStatus").textContent=p.total>=106?"106% — Golden God":"Progress in the making";
+ document.getElementById("completionStatus").textContent=p.total>=100?"Base complete — Bonus progress "+p.total.toFixed(1)+"%":p.total.toFixed(1)+"% complete";
  worlds.forEach(function(w,wi){
    let done=0,total=w.light+w.dark+(w.boss?1:(w.bossLight||w.bossDark?2:0));
    for(let i=1;i<=w.light;i++)if(isDone(K("level",wi+"-light-"+i)))done++;
