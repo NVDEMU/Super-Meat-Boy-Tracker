@@ -17,8 +17,9 @@ const xboxIconFiles={
 const psnIconFiles={
 "Super Meat Boy!":"SMB_Console_Platinum.png","Nostalgia":"SMB_Console_Nostalgia.png","Living in the Past":"SMB_Console_LivingInThePast.png","The Commander":"SMB_Console_TheCommander.png","Business Time":"SMB_Console_BusinessTime.png","The End":"SMB_Console_TheEnd.png","The Real End":"SMB_Console_TheRealEnd.png","Suffragette":"SMB_Console_Suffragette.png","The Kid":"SMB_Console_TheKid.png","I'm A Golden God!":"SMB_Console_ImAGoldenGod.png","Wood Boy":"SMB_WoodBoy.png","Squirrel Boy":"SMB_SquirrelBoy.png","Needle Boy":"SMB_NeedleBoy.png","Blood Clot Boy":"SMB_BloodClotBoy.png","Salt Boy":"SMB_SaltBoy.png","Missile Boy":"SMB_MissileBoy.png","Brimstone Boy":"SMB_BrimstoneBoy.png","Demon Boy":"SMB_DemonBoy.png","Maggot Boy":"SMB_MaggotBoy.png","Zombie Boy":"SMB_ZombieBoy.png","Girl Boy":"SMB_GirlBoy.png","Impossible Boy":"SMB_ImpossibleBoy.png","Old School":"SMB_Console_OldSchool.png","Retro Rampage":"SMB_Console_RetroRampage.png"
 };
-function platformIcon(files,name,fallback){return files[name]?"https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+encodeURIComponent(files[name]):fallback;}
-function iconForName(name){let a=steamAchievements.find(function(x){return x.name===name;});return a?a.icon:"https://shared.fastly.steamstatic.com/community_assets/images/apps/40800/02f5b08a9438bf8972cfc7bcda98d6fc7b016a3b.jpg";}
+function fandomImage(file){return "https://wsrv.nl/?url="+encodeURIComponent("https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+file);}
+function platformIcon(files,name,fallback){return files[name]?fandomImage(files[name]):fallback;}
+function iconForName(name){let a=steamAchievements.find(function(x){return x.name===name;});return a?a.icon:"";}
 const psnAchievements=psnNames.map(function(name,i){return{id:"psn-"+i,name:name,description:psnDescriptions[i],platforms:["playstation"],icon:platformIcon(psnIconFiles,name,iconForName(name))};});
 const xboxAchievements=xboxNames.map(function(name,i){return{id:"xbox-"+i,name:name,description:xboxDescriptions[i],platforms:["xbox"],icon:platformIcon(xboxIconFiles,name,iconForName(name))};});
 const achievements=steamAchievements.concat(psnAchievements,xboxAchievements);
@@ -58,7 +59,7 @@ const characterImages={
  "Meat Boy":"Meatysticker2.png","Bandage Girl":"BandageGirlArtwork.png","8-Bit Meat Boy":"8BitMeatBoyArtwork.png","4-Bit Meat Boy":"4BitMeatBoyArtwork.png","4-Color Meat Boy":"4ColorMeatBoyArtwork.png","Meat Ninja":"MeatNinjaArtwork.png","Brownie":"BrownieArtwork.png","Commander Video":"CommanderVideoArtwork.png","Jill":"JillArtwork.png","Ogmo":"OgmoArtwork.png","Flywrench":"FlywrenchArtwork.png","The Kid":"TheKidArtwork.png","Alien Hominid":"AlienHominidArtwork.png","Tim":"TimArtwork.png","Gish":"GishArtwork.png","Spelunky":"SpelunkyArtwork.png","Pink Knight":"PinkKnightArtwork.png","The Ninja":"NinjaArtwork.png","Headcrab":"HeadCrabArtwork.png","Josef":"JosefArtwork.png","Naija":"NaijaArtwork.png","RunMan":"RunManArtwork.png","Captain Viridian":"CaptainViridianArtwork.png","Steve":"SteveArtwork.png","Goo Ball":"GooBallArtwork.png","Tofu Boy":"TofuBoyArtwork.png"};
 function characterImage(name){
  const file=characterImages[name];
- if(file)return "https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+encodeURIComponent(file);
+ if(file)return fandomImage(file);
  return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(characterFallbackSvg(name));
 }
 function characterFallbackSvg(name){
@@ -240,7 +241,8 @@ function renderAll(){
 function achievementFallbackIcon(a){
  const p=a.platforms[0],label=p==="playstation"?"PS":p==="xbox"?"360":"PC";
  const bg=p==="playstation"?"#171c2b":p==="xbox"?"#107c10":"#1b2838";
- const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="16" fill="'+bg+'"/><circle cx="64" cy="53" r="31" fill="#f2d18b" stroke="#111" stroke-width="6"/><path d="M42 49h44M46 70h36" stroke="#111" stroke-width="6" stroke-linecap="round"/><text x="64" y="106" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="900" fill="#fff">'+label+'</text></svg>';
+ const name=String(a.name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="16" fill="'+bg+'"/><circle cx="64" cy="48" r="28" fill="none" stroke="#fff" stroke-width="5"/><path d="M47 48h34M64 31v34" stroke="#fff" stroke-width="5" stroke-linecap="round"/><text x="64" y="91" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="900" fill="#fff">'+label+'</text><text x="64" y="110" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="#fff">'+name.slice(0,18)+'</text></svg>';
  return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
 }
 function platformName(p){return p==="steam"?"Steam":p==="playstation"?"PlayStation":"Xbox 360";}
