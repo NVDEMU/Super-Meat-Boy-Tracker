@@ -66,7 +66,7 @@ function loadState(key){
  }
 }
 let progress=loadState(STORAGE_KEY),earned=loadState(ACH_KEY);
-const characterImages={"Meat Boy":"https://img3.wikia.nocookie.net/__cb20121208152014/supermeatboy/images/thumb/d/d4/Meatysticker2.png/180px-Meatysticker2.png","Bandage Girl":"https://img4.wikia.nocookie.net/__cb20121211205320/supermeatboy/images/thumb/f/f6/BandageGirlArtwork.png/180px-BandageGirlArtwork.png","8-Bit Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/HUD/8bitunlocked.png","4-Bit Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/HUD/4bitunlocked.png","4-Color Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/HUD/ccunlocked.png","Meat Ninja":"https://img2.wikia.nocookie.net/__cb20121211210452/supermeatboy/images/thumb/e/e5/MeatNinjaArtwork.png/223px-MeatNinjaArtwork.png","Brownie":"https://img4.wikia.nocookie.net/__cb20121211210105/supermeatboy/images/thumb/1/19/BrownieArtwork.png/180px-BrownieArtwork.png","Commander Video":"https://img4.wikia.nocookie.net/__cb20121211210201/supermeatboy/images/thumb/9/95/CommanderVideoArtwork.png/180px-CommanderVideoArtwork.png","Jill":"https://img1.wikia.nocookie.net/__cb20121211210349/supermeatboy/images/thumb/a/af/JillArtwork.png/180px-JillArtwork.png","Ogmo":"https://img4.wikia.nocookie.net/__cb20121211210548/supermeatboy/images/thumb/4/44/OgmoArtwork.png/180px-OgmoArtwork.png","Flywrench":"https://img4.wikia.nocookie.net/__cb20121211210301/supermeatboy/images/thumb/3/36/FlywrenchArtwork.png/180px-FlywrenchArtwork.png","The Kid":"https://img2.wikia.nocookie.net/__cb20121211210633/supermeatboy/images/thumb/5/57/TheKidArtwork.png/180px-TheKidArtwork.png","Alien Hominid":"https://img2.wikia.nocookie.net/__cb20121211210033/supermeatboy/images/thumb/0/08/AlienHominidArtwork.png/180px-AlienHominidArtwork.png","Tim":"https://img2.wikia.nocookie.net/__cb20110129055015/supermeatboy/images/thumb/9/98/Tim_smb.jpg/180px-Tim_smb.jpg","Gish":"https://img4.wikia.nocookie.net/__cb20101230032215/supermeatboy/images/thumb/5/5d/5003026879_6166929f45_o.jpg/180px-5003026879_6166929f45_o.jpg","Spelunky":"https://img2.wikia.nocookie.net/__cb20110129072508/supermeatboy/images/f/f4/Spelunky.png","Pink Knight":"https://img1.wikia.nocookie.net/__cb20110129070720/supermeatboy/images/thumb/2/27/Pink_Knight.png/180px-Pink_Knight.png","The Ninja":"https://img4.wikia.nocookie.net/__cb20110129073221/supermeatboy/images/d/d9/The_Ninja.png","Headcrab":"https://img1.wikia.nocookie.net/__cb20110129053204/supermeatboy/images/thumb/5/54/Headcrab.jpg/180px-Headcrab.jpg","Josef":"https://img2.wikia.nocookie.net/__cb20131118234403/supermeatboy/images/4/43/Josef.png","Naija":"https://img2.wikia.nocookie.net/__cb20110129072822/supermeatboy/images/c/ca/Naija.png","RunMan":"https://img2.wikia.nocookie.net/__cb20110129055540/supermeatboy/images/thumb/e/ed/RunMan.jpg/180px-RunMan.jpg","Captain Viridian":"https://img2.wikia.nocookie.net/__cb20110129061440/supermeatboy/images/thumb/2/2e/Virdian.jpg/180px-Virdian.jpg","Steve":"https://img4.wikia.nocookie.net/__cb20110129060703/supermeatboy/images/thumb/7/7e/Mr_minecraft.jpg/180px-Mr_minecraft.jpg","Goo Ball":"https://img2.wikia.nocookie.net/__cb20110129073523/supermeatboy/images/c/c7/Goo_Ball.png","Tofu Boy":"https://img1.wikia.nocookie.net/__cb20110124140101/supermeatboy/images/thumb/5/58/Tofu_Boy.png/200px-Tofu_Boy.png"};
+const characterImages={"Meat Boy":"https://img3.wikia.nocookie.net/__cb20121208152014/supermeatboy/images/thumb/d/d4/Meatysticker2.png/180px-Meatysticker2.png","Bandage Girl":"https://img4.wikia.nocookie.net/__cb20121211205320/supermeatboy/images/thumb/f/f6/BandageGirlArtwork.png/180px-BandageGirlArtwork.png","8-Bit Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/HUD/8bitunlocked.png","4-Bit Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/HUD/4bitunlocked.png","4-Color Meat Boy":"https://static.wikia.nocookie.net/supermeatboy/images/b/b0/SMB_Icon_MeatBoy4Color.png/revision/latest?cb=20231223180037","Meat Ninja":"https://img2.wikia.nocookie.net/__cb20121211210452/supermeatboy/images/thumb/e/e5/MeatNinjaArtwork.png/223px-MeatNinjaArtwork.png","Brownie":"https://img4.wikia.nocookie.net/__cb20121211210105/supermeatboy/images/thumb/1/19/BrownieArtwork.png/180px-BrownieArtwork.png","Commander Video":"https://img4.wikia.nocookie.net/__cb20121211210201/supermeatboy/images/thumb/9/95/CommanderVideoArtwork.png/180px-CommanderVideoArtwork.png","Jill":"https://img1.wikia.nocookie.net/__cb20121211210349/supermeatboy/images/thumb/a/af/JillArtwork.png/180px-JillArtwork.png","Ogmo":"https://img4.wikia.nocookie.net/__cb20121211210548/supermeatboy/images/thumb/4/44/OgmoArtwork.png/180px-OgmoArtwork.png","Flywrench":"https://img4.wikia.nocookie.net/__cb20121211210301/supermeatboy/images/thumb/3/36/FlywrenchArtwork.png/180px-FlywrenchArtwork.png","The Kid":"https://img2.wikia.nocookie.net/__cb20121211210633/supermeatboy/images/thumb/5/57/TheKidArtwork.png/180px-TheKidArtwork.png","Alien Hominid":"https://img2.wikia.nocookie.net/__cb20121211210033/supermeatboy/images/thumb/0/08/AlienHominidArtwork.png/180px-AlienHominidArtwork.png","Tim":"https://img2.wikia.nocookie.net/__cb20110129055015/supermeatboy/images/thumb/9/98/Tim_smb.jpg/180px-Tim_smb.jpg","Gish":"https://img4.wikia.nocookie.net/__cb20101230032215/supermeatboy/images/thumb/5/5d/5003026879_6166929f45_o.jpg/180px-5003026879_6166929f45_o.jpg","Spelunky":"https://img2.wikia.nocookie.net/__cb20110129072508/supermeatboy/images/f/f4/Spelunky.png","Pink Knight":"https://img1.wikia.nocookie.net/__cb20110129070720/supermeatboy/images/thumb/2/27/Pink_Knight.png/180px-Pink_Knight.png","The Ninja":"https://img4.wikia.nocookie.net/__cb20110129073221/supermeatboy/images/d/d9/The_Ninja.png","Headcrab":"https://img1.wikia.nocookie.net/__cb20110129053204/supermeatboy/images/thumb/5/54/Headcrab.jpg/180px-Headcrab.jpg","Josef":"https://img2.wikia.nocookie.net/__cb20131118234403/supermeatboy/images/4/43/Josef.png","Naija":"https://img2.wikia.nocookie.net/__cb20110129072822/supermeatboy/images/c/ca/Naija.png","RunMan":"https://img2.wikia.nocookie.net/__cb20110129055540/supermeatboy/images/thumb/e/ed/RunMan.jpg/180px-RunMan.jpg","Captain Viridian":"https://img2.wikia.nocookie.net/__cb20110129061440/supermeatboy/images/thumb/2/2e/Virdian.jpg/180px-Virdian.jpg","Steve":"https://img4.wikia.nocookie.net/__cb20110129060703/supermeatboy/images/thumb/7/7e/Mr_minecraft.jpg/180px-Mr_minecraft.jpg","Goo Ball":"https://img2.wikia.nocookie.net/__cb20110129073523/supermeatboy/images/c/c7/Goo_Ball.png","Tofu Boy":"https://img1.wikia.nocookie.net/__cb20110124140101/supermeatboy/images/thumb/5/58/Tofu_Boy.png/200px-Tofu_Boy.png"};
 function characterImage(name){return characterImages[name]||characterImages["Meat Boy"];}
 
 const characterData=[
@@ -110,6 +110,11 @@ function renderCharacters(){
  }else{
    list=characterData.filter(function(c){return c.versions.includes(platform);});
  }
+ list.sort(function(a,b){
+   if(a.name==="Meat Boy") return -1;
+   if(b.name==="Meat Boy") return 1;
+   return a.name.localeCompare(b.name,undefined,{sensitivity:"base"});
+ });
  function characterUnlocked(c){
    if(c.name==="Meat Boy") return true;
    if(platform==="all"){
@@ -202,6 +207,33 @@ function renderWorlds(){
  }).join("");
  root.querySelectorAll("#worlds .check input").forEach(function(x){x.addEventListener("change",function(){toggle(x.id);});});
  root.querySelectorAll("[data-k]").forEach(function(x){x.addEventListener("change",function(){toggle(x.dataset.k);});});
+ updateChapterPercentages();
+}
+
+function chapterProgressPercent(wi){
+ const w=worlds[wi];
+ let done=0,total=w.light+w.dark;
+ for(let i=1;i<=w.light;i++)if(isDone(K("level",wi+"-light-"+i)))done++;
+ for(let i=1;i<=w.dark;i++)if(isDone(K("level",wi+"-dark-"+i)))done++;
+ const bossCount=w.boss?1:((w.bossLight||w.bossDark)?2:0);
+ total+=bossCount;
+ if(w.boss&&isDone(K("boss",wi)))done++;
+ if(w.bossLight&&isDone(K("boss",wi+"-light")))done++;
+ if(w.bossDark&&isDone(K("boss",wi+"-dark")))done++;
+ const chapterWarps=warpMap[wi]||[];
+ total+=chapterWarps.length;
+ chapterWarps.forEach(function(_,n){if(isDone(K("warp",wi+"-"+n)))done++;});
+ const chapterBandages=bandageMap[wi]||[];
+ total+=chapterBandages.length;
+ chapterBandages.forEach(function(_,n){if(isDone(K("bandage",wi+"-"+n)))done++;});
+ return total?Math.round(done/total*100):0;
+}
+
+function updateChapterPercentages(){
+ worlds.forEach(function(_,wi){
+   const el=document.getElementById("wp-"+wi);
+   if(el)el.textContent=chapterProgressPercent(wi)+"%";
+ });
 }
 
 function renderGlitches(){
@@ -275,32 +307,7 @@ function renderAll(){
  document.getElementById("bandagesDone").textContent=p.bandages;
  document.getElementById("aPlusDone").textContent=p.aplusLight;
  document.getElementById("completionStatus").textContent=p.total>=106?"106% — Complete":p.total>=100?"100% base complete — "+p.glitches+"% glitch bonus":p.total.toFixed(1)+"% complete";
- worlds.forEach(function(w,wi){
-   let done=0;
-   let total=w.light+w.dark;
-   for(let i=1;i<=w.light;i++)if(isDone(K("level",wi+"-light-"+i)))done++;
-   for(let i=1;i<=w.dark;i++)if(isDone(K("level",wi+"-dark-"+i)))done++;
-
-   const bossCount=w.boss ? 1 : ((w.bossLight||w.bossDark) ? 2 : 0);
-   total+=bossCount;
-   if(w.boss&&isDone(K("boss",wi)))done++;
-   if(w.bossLight&&isDone(K("boss",wi+"-light")))done++;
-   if(w.bossDark&&isDone(K("boss",wi+"-dark")))done++;
-
-   const chapterWarps=warpMap[wi]||[];
-   total+=chapterWarps.length;
-   chapterWarps.forEach(function(_,n){
-     if(isDone(K("warp",wi+"-"+n)))done++;
-   });
-
-   const chapterBandages=bandageMap[wi]||[];
-   total+=chapterBandages.length;
-   chapterBandages.forEach(function(_,n){
-     if(isDone(K("bandage",wi+"-"+n)))done++;
-   });
-
-   document.getElementById("wp-"+wi).textContent=(total?Math.round(done/total*100):0)+"%";
- });
+ updateChapterPercentages();
  document.getElementById("glitchPct").textContent=Math.round(p.glitches/6*100)+"%";
  renderAchievements();
 }
