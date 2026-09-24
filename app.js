@@ -54,6 +54,50 @@ const warpMap=[
 ];
 
 let progress=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"),earned=JSON.parse(localStorage.getItem(ACH_KEY)||"{}");
+const characterImages={
+ "Meat Boy":"Meatysticker2.png","Bandage Girl":"BandageGirlArtwork.png","8-Bit Meat Boy":"8BitMeatBoyArtwork.png","4-Bit Meat Boy":"4BitMeatBoyArtwork.png","4-Color Meat Boy":"4ColorMeatBoyArtwork.png","Meat Ninja":"MeatNinjaArtwork.png","Brownie":"BrownieArtwork.png","Commander Video":"CommanderVideoArtwork.png","Jill":"JillArtwork.png","Ogmo":"OgmoArtwork.png","Flywrench":"FlywrenchArtwork.png","The Kid":"TheKidArtwork.png","Alien Hominid":"AlienHominidArtwork.png","Tim":"TimArtwork.png","Gish":"GishArtwork.png","Spelunky":"SpelunkyArtwork.png","Pink Knight":"PinkKnightArtwork.png","The Ninja":"NinjaArtwork.png","Headcrab":"HeadCrabArtwork.png","Josef":"JosefArtwork.png","Naija":"NaijaArtwork.png","RunMan":"RunManArtwork.png","Captain Viridian":"CaptainViridianArtwork.png","Steve":"SteveArtwork.png","Goo Ball":"GooBallArtwork.png","Tofu Boy":"TofuBoyArtwork.png"};
+function characterImage(name){return "https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+encodeURIComponent(characterImages[name]||"Meatysticker2.png");}
+const characterData=[
+ {name:"Meat Boy",versions:["pc","console"],unlock:"Available from the start",type:"Starter"},
+ {name:"Bandage Girl",versions:["pc","console"],unlock:"Playable in Cotton Alley",type:"Special"},
+ {name:"8-Bit Meat Boy",versions:["pc","console"],unlock:"Collect 40 bandages",type:"Bandage unlock"},
+ {name:"4-Bit Meat Boy",versions:["pc","console"],unlock:"Collect 60 bandages",type:"Bandage unlock"},
+ {name:"4-Color Meat Boy",versions:["pc","console"],unlock:"Collect 80 bandages",type:"Bandage unlock"},
+ {name:"Meat Ninja",versions:["pc","console"],unlock:"Reach 100% completion",type:"Completion unlock"},
+ {name:"Brownie",versions:["pc","console"],unlock:"Special code / alternate access",type:"Special"},
+ {name:"Commander Video",versions:["pc","console"],unlock:"Complete The Commander! Warp Zone",type:"Warp Zone unlock"},
+ {name:"Jill",versions:["pc","console"],unlock:"Complete The Bootlicker! Warp Zone",type:"Warp Zone unlock"},
+ {name:"Ogmo",versions:["pc","console"],unlock:"Complete The Jump Man! Warp Zone",type:"Warp Zone unlock"},
+ {name:"Flywrench",versions:["pc","console"],unlock:"Complete The Fly Guy! Warp Zone",type:"Warp Zone unlock"},
+ {name:"The Kid",versions:["pc","console"],unlock:"Complete The Guy! Warp Zone",type:"Warp Zone unlock"},
+ {name:"Alien Hominid",versions:["pc","console"],unlock:"Collect 30 bandages",type:"Bandage unlock"},
+ {name:"Tim",versions:["console"],unlock:"Collect 50 bandages",type:"Console unlock"},
+ {name:"Gish",versions:["console"],unlock:"Collect 10 bandages",type:"Console unlock"},
+ {name:"Spelunky",versions:["console"],unlock:"Collect 70 bandages",type:"Console unlock"},
+ {name:"Pink Knight",versions:["console"],unlock:"Collect 90 bandages",type:"Console unlock"},
+ {name:"The Ninja",versions:["console"],unlock:"Collect all 100 bandages",type:"Console unlock"},
+ {name:"Headcrab",versions:["pc"],unlock:"Collect 10 bandages",type:"PC unlock"},
+ {name:"Josef",versions:["pc"],unlock:"Collect 30 bandages",type:"PC unlock"},
+ {name:"Naija",versions:["pc"],unlock:"Collect 50 bandages",type:"PC unlock"},
+ {name:"RunMan",versions:["pc"],unlock:"Collect 70 bandages",type:"PC unlock"},
+ {name:"Captain Viridian",versions:["pc"],unlock:"Collect 90 bandages",type:"PC unlock"},
+ {name:"Steve",versions:["pc"],unlock:"Collect all 100 bandages",type:"PC unlock"},
+ {name:"Goo Ball",versions:["pc"],unlock:"Special code / alternate access",type:"Special"},
+ {name:"Tofu Boy",versions:["pc"],unlock:"Special code / alternate access",type:"Special"}
+];
+function renderCharacters(){
+ const platform=document.getElementById("characterPlatform").value;
+ const list=characterData.filter(function(c){return c.versions.includes(platform);});
+ const done=list.filter(function(c){return isDone(K("character",platform+"-"+c.name));}).length;
+ document.getElementById("characterSummary").textContent=done+" / "+list.length+" "+(platform==="pc"?"PC":"Xbox / PS4")+" characters unlocked";
+ document.getElementById("characterBar").style.width=(list.length?done/list.length*100:0)+"%";
+ document.getElementById("characters").innerHTML=list.map(function(c){
+   const k=K("character",platform+"-"+c.name),is= isDone(k);
+   return '<article class="character-card '+(is?"unlocked":"")+'"><img class="character-image" src="'+characterImage(c.name)+'" alt="'+c.name+' in-game character art"><div class="character-copy"><div class="character-top"><h3>'+c.name+'</h3><span class="character-type">'+c.type+'</span></div><p>'+c.unlock+'</p></div><span class="character-check">'+(is?"✓":"")+'</span><button aria-label="Toggle '+c.name+' unlocked state" data-character="'+k+'"></button></article>';
+ }).join("");
+ document.querySelectorAll("[data-character]").forEach(function(b){b.addEventListener("click",function(){toggle(b.dataset.character);});});
+}
+
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));}
 function saveAch(){localStorage.setItem(ACH_KEY,JSON.stringify(earned));}
 function K(t,id){return t+"-"+id;}
@@ -159,7 +203,7 @@ function completion(){
 }
 
 function renderAll(){
- renderWorlds();renderGlitches();
+ renderWorlds();renderGlitches();renderCharacters();
  const p=completion();
  document.getElementById("completion").textContent=p.total.toFixed(1).replace(/\.0$/,"")+"%";
  document.querySelector(".completion-ring").style.setProperty("--pct",p.total);
@@ -195,6 +239,6 @@ function renderAchievements(){
  document.querySelectorAll("[data-ach]").forEach(function(b){b.addEventListener("click",function(){earned[b.dataset.ach]=!earned[b.dataset.ach];saveAch();renderAchievements();});});
 }
 document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){document.querySelectorAll(".tab,.tab-panel").forEach(function(x){x.classList.remove("active");});t.classList.add("active");document.getElementById(t.dataset.tab).classList.add("active");});});
-document.getElementById("platformFilter").addEventListener("change",renderAchievements);document.getElementById("achievementStatus").addEventListener("change",renderAchievements);
-document.getElementById("resetProgress").addEventListener("click",function(){if(confirm("Reset all completion and achievement progress?")){progress={};earned={};save();saveAch();renderWorlds();renderAll();}});
+document.getElementById("platformFilter").addEventListener("change",renderAchievements);document.getElementById("achievementStatus").addEventListener("change",renderAchievements);document.getElementById("characterPlatform").addEventListener("change",renderCharacters);
+document.getElementById("resetProgress").addEventListener("click",function(){if(confirm("Reset all completion and achievement progress?")){progress={};earned={};save();saveAch();renderWorlds();renderAll();renderCharacters();}});
 renderWorlds();renderAll();
