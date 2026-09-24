@@ -87,20 +87,51 @@ const characterData=[
 ];
 function renderCharacters(){
  const platform=document.getElementById("characterPlatform").value;
- const list=characterData.filter(function(c){return c.versions.includes(platform);});
- // Meat Boy is the default character and is always unlocked in Super Meat Boy.
- // It is intentionally not stored in progress and cannot be toggled.
- const done=list.filter(function(c){return c.name==="Meat Boy"||isDone(K("character",platform+"-"+c.name));}).length;
- document.getElementById("characterSummary").textContent=done+" / "+list.length+" "+(platform==="pc"?"PC":"Xbox / PS4")+" characters unlocked";
+ let list;
+ if(platform==="all"){
+   const seen={};
+   list=characterData.filter(function(c){
+     if(seen[c.name]) return false;
+     seen[c.name]=true;
+     return true;
+   });
+ }else{
+   list=characterData.filter(function(c){return c.versions.includes(platform);});
+ }
+ function characterUnlocked(c){
+   if(c.name==="Meat Boy") return true;
+   if(platform==="all"){
+     return c.versions.some(function(v){return isDone(K("character",v+"-"+c.name));});
+   }
+   return isDone(K("character",platform+"-"+c.name));
+ }
+ const done=list.filter(characterUnlocked).length;
+ document.getElementById("characterSummary").textContent=done+" / "+list.length+" "+(platform==="all"?"characters":(platform==="pc"?"PC":"Xbox / PS4")+" characters")+" unlocked";
  document.getElementById("characterBar").style.width=(list.length?done/list.length*100:0)+"%";
  document.getElementById("characters").innerHTML=list.map(function(c){
    const alwaysUnlocked=c.name==="Meat Boy";
-   const k=K("character",platform+"-"+c.name),is=alwaysUnlocked||isDone(k);
-   return '<article class="character-card '+(is?"unlocked":"")+'"><img class="character-image" src="'+characterImage(c.name)+'" alt="'+c.name+' in-game character art"><div class="character-copy"><div class="character-top"><h3>'+c.name+'</h3><span class="character-type">'+c.type+'</span></div><p>'+c.unlock+'</p></div><span class="character-check">'+(is?"✓":"")+'</span>'+(alwaysUnlocked?'<span class="character-always">Always unlocked</span>':'<button aria-label="Toggle '+c.name+' unlocked state" data-character="'+k+'"></button>')+'</article>';
+   const is=characterUnlocked(c);
+   const key=platform==="all"?"all-"+c.name:platform+"-"+c.name;
+   const versions=platform==="all"?(c.versions.map(function(v){return v==="pc"?"PC":"Xbox / PS4";}).join(" · ")):"";
+   return '<article class="character-card '+(is?"unlocked":"")+'"><img class="character-image" src="'+characterImage(c.name)+'" alt="'+c.name+' in-game character art"><div class="character-copy"><div class="character-top"><h3>'+c.name+'</h3><span class="character-type">'+c.type+'</span></div><p>'+c.unlock+(versions?'<br><small>'+versions+'</small>':"")+'</p></div><span class="character-check">'+(is?"✓":"")+'</span>'+(alwaysUnlocked?'<span class="character-always">Always unlocked</span>':'<button aria-label="Toggle '+c.name+' unlocked state" data-character="'+key+'"></button>')+'</article>';
  }).join("");
- document.querySelectorAll("[data-character]").forEach(function(b){b.addEventListener("click",function(){toggle(b.dataset.character);});});
+ document.querySelectorAll("[data-character]").forEach(function(b){
+   b.addEventListener("click",function(){
+     const name=cFromKey(b.dataset.character);
+     if(platform==="all"){
+       characterData.find(function(x){return x.name===name;}).versions.forEach(function(v){
+         const k=K("character",v+"-"+name);
+         progress[k]=!characterUnlocked(cByName(name));
+       });
+       save();renderAll();
+     }else{
+       toggle(K("character",platform+"-"+name));
+     }
+   });
+ });
+ function cByName(name){return characterData.find(function(x){return x.name===name;});}
+ function cFromKey(key){return key.split("-").slice(1).join("-");}
 }
-
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));}
 function saveAch(){localStorage.setItem(ACH_KEY,JSON.stringify(earned));}
 function K(t,id){return t+"-"+id;}
