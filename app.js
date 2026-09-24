@@ -11,6 +11,10 @@ const psnDescriptions=[
 ];
 const xboxNames=["Nostalgia","Living in the Past","The Commander","The Kid","Tin Boy","Iron Boy!","Sticky Fingers","Business Time","The End","The Real End","Suffragette","I'm A Golden God!"];
 const xboxDescriptions=["Find and unlock a warp zone.","Find and complete 5 warp zones.","Find and unlock Commander Video.","Find and unlock The Kid.","Complete 10 levels consecutively without dying.","Complete a full chapter without dying.","Collect 10 bandages.","Collect 50 bandages.","Complete the main game.","Complete the Dark World.","Complete the Cotten Alley.","100% the game."];
+function iconForName(name){
+ const a=steamAchievements.find(function(x){return x.name===name;});
+ return a?a.icon:iconUrls[0];
+}
 const xboxIconFiles={
 "Nostalgia":"SMB_Xbox_Nostalgia.png","Living in the Past":"SMB_Xbox_LivingInThePast.png","The Commander":"SMB_Xbox_TheCommander.png","The Kid":"SMB_Xbox_TheKid.png","Tin Boy":"SMB_Xbox_TinBoy.png","Iron Boy!":"SMB_Xbox_IronBoy!.png","Sticky Fingers":"SMB_Xbox_StickyFingers.png","Business Time":"SMB_Xbox_BusinessTime.png","The End":"SMB_Xbox_TheEnd.png","The Real End":"SMB_Xbox_TheRealEnd.png","Suffragette":"SMB_Xbox_Suffragette.png","I'm A Golden God!":"SMB_Xbox_ImAGoldenGod!.png"
 };
@@ -204,7 +208,7 @@ function renderGlitches(){
 }
 
 function completion(){
- let lightDone=0,darkDone=0,bosses=0,warpZones=0,bandages=0,aplusLight=0,aplusDark=0;
+ let lightDone=0,darkDone=0,regularBosses=0,endLightBoss=false,endDarkBoss=false,warpZones=0,bandages=0,aplusLight=0,aplusDark=0;
  worlds.forEach(function(w,wi){
    for(let i=1;i<=w.light;i++){
      if(isDone(K("level",wi+"-light-"+i)))lightDone++;
@@ -214,10 +218,10 @@ function completion(){
      if(isDone(K("level",wi+"-dark-"+i)))darkDone++;
      if(isDone(K("aplus",wi+"-dark-"+i)))aplusDark++;
    }
-   if(w.boss && isDone(K("boss",wi)))bosses++;
+   if(w.boss && isDone(K("boss",wi)))regularBosses++;
    if(w.bossLight || w.bossDark){
-     if(isDone(K("boss",wi+"-light")))bosses++;
-     if(isDone(K("boss",wi+"-dark")))bosses++;
+     if(isDone(K("boss",wi+"-light")))endLightBoss=true;
+     if(isDone(K("boss",wi+"-dark")))endDarkBoss=true;
    }
    (warpMap[wi]||[]).forEach(function(_,n){if(isDone(K("warp",wi+"-"+n)))warpZones++;});
    (bandageMap[wi]||[]).forEach(function(_,n){if(isDone(K("bandage",wi+"-"+n)))bandages++;});
@@ -225,41 +229,29 @@ function completion(){
  let glitches=0;
  for(let i=1;i<=6;i++)if(isDone(K("glitch",i)))glitches++;
 
- // Verified checklist counts:
- // 125 Light World levels, 125 Dark World levels, 6 boss levels,
- // 20 Warp Zones, and 100 bandages.
- //
- // The requested 376-point base is normalized across those real checklist counts:
- // Light = 120 points, Dark = 120, Bosses = 6, Warp Zones = 30, Bandages = 100.
- // Glitch levels are NOT part of the 376 base; each adds exactly +1 percentage point.
+ // Verified actual checklist counts:
+ // 125 Light World levels + 125 Dark World levels + 20 Warp Zones + 6 boss points + 100 bandages.
+ // The requested 376-point base assigns:
+ // Light 120 + Dark 120 + Bosses 6 + Warp Zones 30 + Bandages 100.
+ // The two Dr. Fetus fights are tracked separately, but together count as the
+ // single Chapter 6 boss point in the 6-boss completion category.
+ const bossPointCount=regularBosses+(endLightBoss&&endDarkBoss?1:0);
  const lightPoints=(lightDone/125)*120;
  const darkPoints=(darkDone/125)*120;
- const bossPoints=(bosses/6)*6;
+ const bossPoints=(bossPointCount/6)*6;
  const warpPoints=(warpZones/20)*30;
- const bandagePoints=(bandages/100)*100;
+ const bandagePoints=bandages;
  const basePoints=lightPoints+darkPoints+bossPoints+warpPoints+bandagePoints;
  const basePercentage=(basePoints/376)*100;
  const total=basePercentage+glitches;
+
  return{
-   total:total,
-   totalPoints:basePoints,
-   basePoints:basePoints,
-   basePercentage:basePercentage,
-   lightPoints:lightPoints,
-   darkPoints:darkPoints,
-   bossPoints:bossPoints,
-   warpPoints:warpPoints,
-   bandagePoints:bandagePoints,
-   bonusPoints:glitches,
-   standardDone:lightDone+darkDone,
-   lightDone:lightDone,
-   darkDone:darkDone,
-   bandages:bandages,
-   warps:warpZones,
-   bosses:bosses,
-   glitches:glitches,
-   aplusLight:aplusLight,
-   aplusDark:aplusDark
+   total:total,totalPoints:basePoints,basePoints:basePoints,basePercentage:basePercentage,
+   lightPoints:lightPoints,darkPoints:darkPoints,bossPoints:bossPoints,warpPoints:warpPoints,
+   bandagePoints:bandagePoints,bonusPoints:glitches,standardDone:lightDone+darkDone,
+   lightDone:lightDone,darkDone:darkDone,bandages:bandages,warps:warpZones,
+   bosses:bossPointCount,bossFights:regularBosses+(endLightBoss?1:0)+(endDarkBoss?1:0),
+   glitches:glitches,aplusLight:aplusLight,aplusDark:aplusDark
  };
 }
 function renderAll(){
