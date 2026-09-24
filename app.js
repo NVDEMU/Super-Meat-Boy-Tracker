@@ -19,7 +19,7 @@ const worlds=[
  {name:"The Forest",chapter:1,light:20,dark:20,boss:"Lil' Slugger"},
  {name:"The Hospital",chapter:2,light:20,dark:20,boss:"C.H.A.D."},
  {name:"The Salt Factory",chapter:3,light:20,dark:20,boss:"Brownie"},
- {name:"Hell",chapter:4,light:20,dark:20,boss:"The Larries"},
+ {name:"Hell",chapter:4,light:20,dark:20,boss:"Little Horn"},
  {name:"The Rapture",chapter:5,light:20,dark:20,boss:"Larries Lament"},
  {name:"The End",chapter:6,light:5,dark:5,boss:"Dr. Fetus"},
  {name:"The Cotton Alley",chapter:7,light:20,dark:20,boss:null}
