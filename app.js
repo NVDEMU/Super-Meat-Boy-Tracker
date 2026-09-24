@@ -56,7 +56,17 @@ const warpMap=[
 let progress=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"),earned=JSON.parse(localStorage.getItem(ACH_KEY)||"{}");
 const characterImages={
  "Meat Boy":"Meatysticker2.png","Bandage Girl":"BandageGirlArtwork.png","8-Bit Meat Boy":"8BitMeatBoyArtwork.png","4-Bit Meat Boy":"4BitMeatBoyArtwork.png","4-Color Meat Boy":"4ColorMeatBoyArtwork.png","Meat Ninja":"MeatNinjaArtwork.png","Brownie":"BrownieArtwork.png","Commander Video":"CommanderVideoArtwork.png","Jill":"JillArtwork.png","Ogmo":"OgmoArtwork.png","Flywrench":"FlywrenchArtwork.png","The Kid":"TheKidArtwork.png","Alien Hominid":"AlienHominidArtwork.png","Tim":"TimArtwork.png","Gish":"GishArtwork.png","Spelunky":"SpelunkyArtwork.png","Pink Knight":"PinkKnightArtwork.png","The Ninja":"NinjaArtwork.png","Headcrab":"HeadCrabArtwork.png","Josef":"JosefArtwork.png","Naija":"NaijaArtwork.png","RunMan":"RunManArtwork.png","Captain Viridian":"CaptainViridianArtwork.png","Steve":"SteveArtwork.png","Goo Ball":"GooBallArtwork.png","Tofu Boy":"TofuBoyArtwork.png"};
-function characterImage(name){return "https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+encodeURIComponent(characterImages[name]||"Meatysticker2.png");}
+function characterImage(name){
+ // Fandom's Special:Redirect image endpoint is not reliable for hotlinking from GitHub Pages.
+ // Use a self-contained SVG portrait so every character is visible without a third-party image request.
+ const palettes={
+  "Meat Boy":["#c92828","#090909"],"Bandage Girl":["#f08ab8","#090909"],"8-Bit Meat Boy":["#d12b2b","#111111"],"4-Bit Meat Boy":["#d12b2b","#111111"],"4-Color Meat Boy":["#d12b2b","#111111"],"Meat Ninja":["#b51f2b","#111111"],"Brownie":["#76513d","#17110e"],"Commander Video":["#262626","#ffffff"],"Jill":["#d8b08b","#33251e"],"Ogmo":["#f0f0f0","#111111"],"Flywrench":["#4d5b8d","#f5f5f5"],"The Kid":["#efe9df","#111111"],"Alien Hominid":["#e7d9b7","#111111"],"Tim":["#5b8fd1","#151515"],"Gish":["#242424","#eeeeee"],"Spelunky":["#d9a34a","#22180f"],"Pink Knight":["#f08ab8","#242424"],"The Ninja":["#3b3b3b","#eeeeee"],"Headcrab":["#b45b42","#181818"],"Josef":["#777777","#111111"],"Naija":["#e9c4ad","#151515"],"RunMan":["#e4c58b","#202020"],"Captain Viridian":["#55a9e8","#111111"],"Steve":["#5b88c9","#171717"],"Goo Ball":["#6e9b5d","#101010"],"Tofu Boy":["#eee8d8","#242424"]
+ };
+ const p=palettes[name]||["#c92828","#090909"];
+ const safe=String(name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="18" fill="#151515"/><rect x="24" y="24" width="80" height="70" rx="16" fill="'+p[0]+'" stroke="#000" stroke-width="7"/><rect x="31" y="91" width="24" height="18" rx="5" fill="'+p[0]+'" stroke="#000" stroke-width="6"/><rect x="73" y="91" width="24" height="18" rx="5" fill="'+p[0]+'" stroke="#000" stroke-width="6"/><circle cx="48" cy="54" r="10" fill="'+p[1]+'"/><circle cx="80" cy="54" r="10" fill="'+p[1]+'"/><circle cx="45" cy="50" r="3" fill="#fff"/><circle cx="77" cy="50" r="3" fill="#fff"/><path d="M49 74 Q64 84 79 74" fill="none" stroke="'+p[1]+'" stroke-width="6" stroke-linecap="round"/><text x="64" y="121" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">'+safe+'</text></svg>';
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
 const characterData=[
  {name:"Meat Boy",versions:["pc","console"],unlock:"Available from the start",type:"Starter"},
  {name:"Bandage Girl",versions:["pc","console"],unlock:"Playable in Cotton Alley",type:"Special"},
