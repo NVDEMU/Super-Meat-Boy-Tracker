@@ -57,15 +57,13 @@ let progress=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"),earned=JSON.par
 const characterImages={
  "Meat Boy":"Meatysticker2.png","Bandage Girl":"BandageGirlArtwork.png","8-Bit Meat Boy":"8BitMeatBoyArtwork.png","4-Bit Meat Boy":"4BitMeatBoyArtwork.png","4-Color Meat Boy":"4ColorMeatBoyArtwork.png","Meat Ninja":"MeatNinjaArtwork.png","Brownie":"BrownieArtwork.png","Commander Video":"CommanderVideoArtwork.png","Jill":"JillArtwork.png","Ogmo":"OgmoArtwork.png","Flywrench":"FlywrenchArtwork.png","The Kid":"TheKidArtwork.png","Alien Hominid":"AlienHominidArtwork.png","Tim":"TimArtwork.png","Gish":"GishArtwork.png","Spelunky":"SpelunkyArtwork.png","Pink Knight":"PinkKnightArtwork.png","The Ninja":"NinjaArtwork.png","Headcrab":"HeadCrabArtwork.png","Josef":"JosefArtwork.png","Naija":"NaijaArtwork.png","RunMan":"RunManArtwork.png","Captain Viridian":"CaptainViridianArtwork.png","Steve":"SteveArtwork.png","Goo Ball":"GooBallArtwork.png","Tofu Boy":"TofuBoyArtwork.png"};
 function characterImage(name){
- // Fandom's Special:Redirect image endpoint is not reliable for hotlinking from GitHub Pages.
- // Use a self-contained SVG portrait so every character is visible without a third-party image request.
- const palettes={
-  "Meat Boy":["#c92828","#090909"],"Bandage Girl":["#f08ab8","#090909"],"8-Bit Meat Boy":["#d12b2b","#111111"],"4-Bit Meat Boy":["#d12b2b","#111111"],"4-Color Meat Boy":["#d12b2b","#111111"],"Meat Ninja":["#b51f2b","#111111"],"Brownie":["#76513d","#17110e"],"Commander Video":["#262626","#ffffff"],"Jill":["#d8b08b","#33251e"],"Ogmo":["#f0f0f0","#111111"],"Flywrench":["#4d5b8d","#f5f5f5"],"The Kid":["#efe9df","#111111"],"Alien Hominid":["#e7d9b7","#111111"],"Tim":["#5b8fd1","#151515"],"Gish":["#242424","#eeeeee"],"Spelunky":["#d9a34a","#22180f"],"Pink Knight":["#f08ab8","#242424"],"The Ninja":["#3b3b3b","#eeeeee"],"Headcrab":["#b45b42","#181818"],"Josef":["#777777","#111111"],"Naija":["#e9c4ad","#151515"],"RunMan":["#e4c58b","#202020"],"Captain Viridian":["#55a9e8","#111111"],"Steve":["#5b88c9","#171717"],"Goo Ball":["#6e9b5d","#101010"],"Tofu Boy":["#eee8d8","#242424"]
- };
- const p=palettes[name]||["#c92828","#090909"];
+ const file=characterImages[name];
+ if(file)return "https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+encodeURIComponent(file);
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(characterFallbackSvg(name));
+}
+function characterFallbackSvg(name){
  const safe=String(name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
- const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="18" fill="#151515"/><rect x="24" y="24" width="80" height="70" rx="16" fill="'+p[0]+'" stroke="#000" stroke-width="7"/><rect x="31" y="91" width="24" height="18" rx="5" fill="'+p[0]+'" stroke="#000" stroke-width="6"/><rect x="73" y="91" width="24" height="18" rx="5" fill="'+p[0]+'" stroke="#000" stroke-width="6"/><circle cx="48" cy="54" r="10" fill="'+p[1]+'"/><circle cx="80" cy="54" r="10" fill="'+p[1]+'"/><circle cx="45" cy="50" r="3" fill="#fff"/><circle cx="77" cy="50" r="3" fill="#fff"/><path d="M49 74 Q64 84 79 74" fill="none" stroke="'+p[1]+'" stroke-width="6" stroke-linecap="round"/><text x="64" y="121" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">'+safe+'</text></svg>';
- return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+ return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="18" fill="#151515"/><rect x="24" y="24" width="80" height="70" rx="16" fill="#c92828" stroke="#000" stroke-width="7"/><circle cx="48" cy="54" r="10" fill="#090909"/><circle cx="80" cy="54" r="10" fill="#090909"/><circle cx="45" cy="50" r="3" fill="#fff"/><circle cx="77" cy="50" r="3" fill="#fff"/><path d="M49 74 Q64 84 79 74" fill="none" stroke="#090909" stroke-width="6" stroke-linecap="round"/><text x="64" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">'+safe+'</text></svg>';
 }
 const characterData=[
  {name:"Meat Boy",versions:["pc","console"],unlock:"Available from the start",type:"Starter"},
@@ -106,7 +104,7 @@ function renderCharacters(){
  document.getElementById("characters").innerHTML=list.map(function(c){
    const alwaysUnlocked=c.name==="Meat Boy";
    const k=K("character",platform+"-"+c.name),is=alwaysUnlocked||isDone(k);
-   return '<article class="character-card '+(is?"unlocked":"")+'"><img class="character-image" src="'+characterImage(c.name)+'" alt="'+c.name+' in-game character art"><div class="character-copy"><div class="character-top"><h3>'+c.name+'</h3><span class="character-type">'+c.type+'</span></div><p>'+c.unlock+'</p></div><span class="character-check">'+(is?"✓":"")+'</span>'+(alwaysUnlocked?'<span class="character-always">Always unlocked</span>':'<button aria-label="Toggle '+c.name+' unlocked state" data-character="'+k+'"></button>')+'</article>';
+   return '<article class="character-card '+(is?"unlocked":"")+'"><img class="character-image" src="'+characterImage(c.name)+'" alt="'+c.name+' in-game character art" onerror="this.onerror=null;this.src=characterFallbackSvg(c.name)"><div class="character-copy"><div class="character-top"><h3>'+c.name+'</h3><span class="character-type">'+c.type+'</span></div><p>'+c.unlock+'</p></div><span class="character-check">'+(is?"✓":"")+'</span>'+(alwaysUnlocked?'<span class="character-always">Always unlocked</span>':'<button aria-label="Toggle '+c.name+' unlocked state" data-character="'+k+'"></button>')+'</article>';
  }).join("");
  document.querySelectorAll("[data-character]").forEach(function(b){b.addEventListener("click",function(){toggle(b.dataset.character);});});
 }
@@ -239,6 +237,12 @@ function renderAll(){
  renderAchievements();
 }
 
+function achievementFallbackIcon(a){
+ const p=a.platforms[0],label=p==="playstation"?"PS":p==="xbox"?"360":"PC";
+ const bg=p==="playstation"?"#171c2b":p==="xbox"?"#107c10":"#1b2838";
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="16" fill="'+bg+'"/><circle cx="64" cy="53" r="31" fill="#f2d18b" stroke="#111" stroke-width="6"/><path d="M42 49h44M46 70h36" stroke="#111" stroke-width="6" stroke-linecap="round"/><text x="64" y="106" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="900" fill="#fff">'+label+'</text></svg>';
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
 function platformName(p){return p==="steam"?"Steam":p==="playstation"?"PlayStation":"Xbox 360";}
 function renderAchievements(){
  let platform=document.getElementById("platformFilter").value,status=document.getElementById("achievementStatus").value;
@@ -248,7 +252,7 @@ function renderAchievements(){
  document.getElementById("achievementSummary").textContent=count+" / "+selected.length+" "+(platform==="all"?"total":platformName(platform))+" achievements earned";
  document.getElementById("achievementsDone").textContent=count;
  document.getElementById("achievementBar").style.width=(selected.length?count/selected.length*100:0)+"%";
- document.getElementById("achievements").innerHTML=list.map(function(a){return'<article class="achievement-card '+(earned[a.id]?"earned":"")+'"><img class="achievement-icon" src="'+a.icon+'" alt="'+a.name+' icon"><div><h3>'+a.name+'</h3><p>'+a.description+'</p><div class="platforms">'+a.platforms.map(function(p){return'<span class="badge">'+platformName(p)+'</span>';}).join("")+'</div></div>'+(earned[a.id]?'<span class="earned-mark">✓</span>':"")+'<button aria-label="Toggle '+a.name+'" data-ach="'+a.id+'"></button></article>';}).join("");
+ document.getElementById("achievements").innerHTML=list.map(function(a){return'<article class="achievement-card '+(earned[a.id]?"earned":"")+'"><img class="achievement-icon" src="'+a.icon+'" alt="'+a.name+' icon" onerror="this.onerror=null;this.src=achievementFallbackIcon(a)"><div><h3>'+a.name+'</h3><p>'+a.description+'</p><div class="platforms">'+a.platforms.map(function(p){return'<span class="badge">'+platformName(p)+'</span>';}).join("")+'</div></div>'+(earned[a.id]?'<span class="earned-mark">✓</span>':"")+'<button aria-label="Toggle '+a.name+'" data-ach="'+a.id+'"></button></article>';}).join("");
  document.querySelectorAll("[data-ach]").forEach(function(b){b.addEventListener("click",function(){earned[b.dataset.ach]=!earned[b.dataset.ach];saveAch();renderAchievements();});});
 }
 document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){document.querySelectorAll(".tab,.tab-panel").forEach(function(x){x.classList.remove("active");});t.classList.add("active");document.getElementById(t.dataset.tab).classList.add("active");});});
