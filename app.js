@@ -28,7 +28,7 @@ const worlds=[
  {name:"The Salt Factory",chapter:3,light:20,dark:20,boss:"Brownie"},
  {name:"Hell",chapter:4,light:20,dark:20,boss:"Little Horn"},
  {name:"The Rapture",chapter:5,light:20,dark:20,boss:"Larries Lament"},
- {name:"The End",chapter:6,light:5,dark:5,boss:"Dr. Fetus"},
+ {name:"The End",chapter:6,light:5,dark:5,bossLight:"Dr. Fetus",bossDark:"Dr. Fetus"},
  {name:"The Cotton Alley",chapter:7,light:20,dark:20,boss:null}
 ];
 
@@ -47,7 +47,7 @@ const bandageMap=[
 const warpMap=[
  [{name:"Sky Pup",found:"1-5 Holy Mountain"},{name:"The Commander!",found:"1-12 Revolve"},{name:"Hand Held Hack",found:"1-19 Intermission"},{name:"Space Boy",found:"1-13X Tommy's Condo"}],
  [{name:"The Bootlicker!",found:"2-8 The Sabbath"},{name:"Castle Crushers",found:"2-12 Above"},{name:"The Blood Shed",found:"2-15 Gallbladder"},{name:"1977",found:"2-5X Agent Orange"}],
- [{name:"Cartridge Dump",found:"3-5 Uptown"},{name:"Tunnel Vision",found:"3-7 Mind the Gap"},{name:"The Jump Man",found:"3-16 Mono"},{name:"Kontra",found:"3-8X Salt Crown"}],
+ [{name:"Cartridge Dump",found:"3-5 Uptown"},{name:"Tunnel Vision",found:"3-7 Mind the Gap"},{name:"The Jump Man!",found:"3-16 Mono"},{name:"Kontra",found:"3-8X Salt Crown"}],
  [{name:"Brimstone",found:"4-8 Weibe"},{name:"The Key Master",found:"4-14 Adversary"},{name:"The Fly Guy!",found:"4-18 Boris"},{name:"MMMMMM",found:"4-7X Thistle"}],
  [{name:"Skyscraper",found:"5-1 The Witness"},{name:"The Guy!",found:"5-7 The Fallen"},{name:"Sunshine Island",found:"5-12 10 Horns"},{name:"Meat is Death",found:"5-20X Quietus"}],
  [],[]
@@ -78,9 +78,14 @@ function renderWorlds(){
    let html='<article class="world-card"><div class="world-head"><div><h3>Chapter '+w.chapter+' — '+w.name+'</h3><p class="chapter-note">'+w.light+' Light + '+w.dark+' Dark'+(w.boss?" + boss":"")+'</p></div><span class="world-pct" id="wp-'+wi+'">0%</span></div>';
    html+=renderLevelGrid(wi,"light",w.light);
    html+=renderLevelGrid(wi,"dark",w.dark);
-   if(w.boss){
-     const bk=K("boss",wi);
-     html+='<div class="special-row"><label><input data-k="'+bk+'" type="checkbox" '+(isDone(bk)?"checked":"")+'> Boss — '+w.boss+'</label></div>';
+   if(w.boss || w.bossLight || w.bossDark){
+     if(w.boss){
+       const bk=K("boss",wi);
+       html+='<div class="special-row"><label><input data-k="'+bk+'" type="checkbox" '+(isDone(bk)?"checked":"")+'> Boss — '+w.boss+'</label></div>';
+     } else {
+       const lightBossK=K("boss",wi+"-light"), darkBossK=K("boss",wi+"-dark");
+       html+='<div class="special-row boss-pair"><label><input data-k="'+lightBossK+'" type="checkbox" '+(isDone(lightBossK)?"checked":"")+'> Light Boss — Dr. Fetus</label><label><input data-k="'+darkBossK+'" type="checkbox" '+(isDone(darkBossK)?"checked":"")+'> Dark Boss — Dr. Fetus</label></div>';
+     }
    }
    const warps=warpMap[wi]||[];
    if(warps.length){
@@ -131,6 +136,10 @@ function completion(){
      if(isDone(K("aplus",wi+"-dark-"+i)))aplusDark++;
    }
    if(w.boss && isDone(K("boss",wi)))bosses++;
+   if(w.bossLight || w.bossDark){
+     const lightDone=isDone(K("boss",wi+"-light")), darkDone=isDone(K("boss",wi+"-dark"));
+     if(lightDone && darkDone)bosses++;
+   }
    (warpMap[wi]||[]).forEach(function(_,n){if(isDone(K("warp",wi+"-"+n)))warps++;});
    (bandageMap[wi]||[]).forEach(function(_,n){if(isDone(K("bandage",wi+"-"+n)))bandages++;});
  });
@@ -161,10 +170,12 @@ function renderAll(){
  document.getElementById("aPlusDone").textContent=p.aplusLight;
  document.getElementById("completionStatus").textContent=p.total>=106?"106% — Golden God":"Progress in the making";
  worlds.forEach(function(w,wi){
-   let done=0,total=w.light+w.dark+(w.boss?1:0);
+   let done=0,total=w.light+w.dark+(w.boss?1:(w.bossLight||w.bossDark?2:0));
    for(let i=1;i<=w.light;i++)if(isDone(K("level",wi+"-light-"+i)))done++;
    for(let i=1;i<=w.dark;i++)if(isDone(K("level",wi+"-dark-"+i)))done++;
    if(w.boss&&isDone(K("boss",wi)))done++;
+   if(w.bossLight&&isDone(K("boss",wi+"-light")))done++;
+   if(w.bossDark&&isDone(K("boss",wi+"-dark")))done++;
    document.getElementById("wp-"+wi).textContent=Math.round(done/total*100)+"%";
  });
  document.getElementById("glitchPct").textContent=Math.round(p.glitches/6*100)+"%";
