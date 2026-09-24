@@ -276,13 +276,30 @@ function renderAll(){
  document.getElementById("aPlusDone").textContent=p.aplusLight;
  document.getElementById("completionStatus").textContent=p.total>=106?"106% — Complete":p.total>=100?"100% base complete — "+p.glitches+"% glitch bonus":p.total.toFixed(1)+"% complete";
  worlds.forEach(function(w,wi){
-   let done=0,total=w.light+w.dark+(w.boss?1:(w.bossLight||w.bossDark?2:0));
+   let done=0;
+   let total=w.light+w.dark;
    for(let i=1;i<=w.light;i++)if(isDone(K("level",wi+"-light-"+i)))done++;
    for(let i=1;i<=w.dark;i++)if(isDone(K("level",wi+"-dark-"+i)))done++;
+
+   const bossCount=w.boss ? 1 : ((w.bossLight||w.bossDark) ? 2 : 0);
+   total+=bossCount;
    if(w.boss&&isDone(K("boss",wi)))done++;
    if(w.bossLight&&isDone(K("boss",wi+"-light")))done++;
    if(w.bossDark&&isDone(K("boss",wi+"-dark")))done++;
-   document.getElementById("wp-"+wi).textContent=Math.round(done/total*100)+"%";
+
+   const chapterWarps=warpMap[wi]||[];
+   total+=chapterWarps.length;
+   chapterWarps.forEach(function(_,n){
+     if(isDone(K("warp",wi+"-"+n)))done++;
+   });
+
+   const chapterBandages=bandageMap[wi]||[];
+   total+=chapterBandages.length;
+   chapterBandages.forEach(function(_,n){
+     if(isDone(K("bandage",wi+"-"+n)))done++;
+   });
+
+   document.getElementById("wp-"+wi).textContent=(total?Math.round(done/total*100):0)+"%";
  });
  document.getElementById("glitchPct").textContent=Math.round(p.glitches/6*100)+"%";
  renderAchievements();
