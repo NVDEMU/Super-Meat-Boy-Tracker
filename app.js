@@ -57,7 +57,15 @@ const warpMap=[
  [],[]
 ];
 
-let progress=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"),earned=JSON.parse(localStorage.getItem(ACH_KEY)||"{}");
+function loadState(key){
+ try{
+   const value=JSON.parse(localStorage.getItem(key)||"{}");
+   return value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+ }catch(e){
+   return {};
+ }
+}
+let progress=loadState(STORAGE_KEY),earned=loadState(ACH_KEY);
 const characterImages={"Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/meatboyanim.png","Bandage Girl":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/bandagegirl.png","8-Bit Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/gameboy.png","4-Bit Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/4bitmeatboyfinal.png","4-Color Meat Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/cc.png","Meat Ninja":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/meatninja.png","Brownie":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/brownie.png","Commander Video":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/commander_video.png","Jill":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/jill.png","Ogmo":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/ogmo.png","Flywrench":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/flywrench.png","The Kid":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/kid.png","Alien Hominid":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/ah.png","Tim":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/Tim.png","Gish":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/gish.png","Spelunky":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/spelunky.png","Headcrab":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/headcrab.png","Josef":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/mech.png","Naija":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/naija.png","RunMan":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/runman.png","Captain Viridian":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/vvvvvv.png","Goo Ball":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/wog.png","Tofu Boy":"https://raw.githubusercontent.com/Alexcoti284/SuperMeatBoy_MBA/4121e65a7ddc28cdf50b66c13274b338acd57b00/Assets/Super%20Meat%20Boy/pc/Animations/tofuboy.png"};
 function characterImage(name){return characterImages[name]||characterImages["Meat Boy"];}
 
@@ -255,7 +263,9 @@ function completion(){
  };
 }
 function renderAll(){
- renderWorlds();renderGlitches();renderCharacters();
+ try{renderWorlds();}catch(e){console.error("World renderer failed:",e);}
+ try{renderGlitches();}catch(e){console.error("Glitch renderer failed:",e);}
+ try{renderCharacters();}catch(e){console.error("Character renderer failed:",e);}
  const p=completion();
  document.getElementById("completion").textContent=p.total.toFixed(1).replace(/\.0$/,"")+"%";
  document.querySelector(".completion-ring").style.setProperty("--pct",Math.min(100,p.total));
