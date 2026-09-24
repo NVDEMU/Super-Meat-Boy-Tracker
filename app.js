@@ -11,9 +11,16 @@ const psnDescriptions=[
 ];
 const xboxNames=["Nostalgia","Living in the Past","The Commander","The Kid","Tin Boy","Iron Boy!","Sticky Fingers","Business Time","The End","The Real End","Suffragette","I'm A Golden God!"];
 const xboxDescriptions=["Find and unlock a warp zone.","Find and complete 5 warp zones.","Find and unlock Commander Video.","Find and unlock The Kid.","Complete 10 levels consecutively without dying.","Complete a full chapter without dying.","Collect 10 bandages.","Collect 50 bandages.","Complete the main game.","Complete the Dark World.","Complete the Cotten Alley.","100% the game."];
+const xboxIconFiles={
+"Nostalgia":"SMB_Xbox_Nostalgia.png","Living in the Past":"SMB_Xbox_LivingInThePast.png","The Commander":"SMB_Xbox_TheCommander.png","The Kid":"SMB_Xbox_TheKid.png","Tin Boy":"SMB_Xbox_TinBoy.png","Iron Boy!":"SMB_Xbox_IronBoy!.png","Sticky Fingers":"SMB_Xbox_StickyFingers.png","Business Time":"SMB_Xbox_BusinessTime.png","The End":"SMB_Xbox_TheEnd.png","The Real End":"SMB_Xbox_TheRealEnd.png","Suffragette":"SMB_Xbox_Suffragette.png","I'm A Golden God!":"SMB_Xbox_ImAGoldenGod!.png"
+};
+const psnIconFiles={
+"Super Meat Boy!":"SMB_Console_Platinum.png","Nostalgia":"SMB_Console_Nostalgia.png","Living in the Past":"SMB_Console_LivingInThePast.png","The Commander":"SMB_Console_TheCommander.png","Business Time":"SMB_Console_BusinessTime.png","The End":"SMB_Console_TheEnd.png","The Real End":"SMB_Console_TheRealEnd.png","Suffragette":"SMB_Console_Suffragette.png","The Kid":"SMB_Console_TheKid.png","I'm A Golden God!":"SMB_Console_ImAGoldenGod.png","Wood Boy":"SMB_WoodBoy.png","Squirrel Boy":"SMB_SquirrelBoy.png","Needle Boy":"SMB_NeedleBoy.png","Blood Clot Boy":"SMB_BloodClotBoy.png","Salt Boy":"SMB_SaltBoy.png","Missile Boy":"SMB_MissileBoy.png","Brimstone Boy":"SMB_BrimstoneBoy.png","Demon Boy":"SMB_DemonBoy.png","Maggot Boy":"SMB_MaggotBoy.png","Zombie Boy":"SMB_ZombieBoy.png","Girl Boy":"SMB_GirlBoy.png","Impossible Boy":"SMB_ImpossibleBoy.png","Old School":"SMB_Console_OldSchool.png","Retro Rampage":"SMB_Console_RetroRampage.png"
+};
+function platformIcon(files,name,fallback){return files[name]?"https://supermeatboy.fandom.com/wiki/Special:Redirect/file/"+encodeURIComponent(files[name]):fallback;}
 function iconForName(name){let a=steamAchievements.find(function(x){return x.name===name;});return a?a.icon:"https://shared.fastly.steamstatic.com/community_assets/images/apps/40800/02f5b08a9438bf8972cfc7bcda98d6fc7b016a3b.jpg";}
-const psnAchievements=psnNames.map(function(name,i){return{id:"psn-"+i,name:name,description:psnDescriptions[i],platforms:["playstation"],icon:iconForName(name)};});
-const xboxAchievements=xboxNames.map(function(name,i){return{id:"xbox-"+i,name:name,description:xboxDescriptions[i],platforms:["xbox"],icon:iconForName(name)};});
+const psnAchievements=psnNames.map(function(name,i){return{id:"psn-"+i,name:name,description:psnDescriptions[i],platforms:["playstation"],icon:platformIcon(psnIconFiles,name,iconForName(name))};});
+const xboxAchievements=xboxNames.map(function(name,i){return{id:"xbox-"+i,name:name,description:xboxDescriptions[i],platforms:["xbox"],icon:platformIcon(xboxIconFiles,name,iconForName(name))};});
 const achievements=steamAchievements.concat(psnAchievements,xboxAchievements);
 const worlds=[
  {name:"The Forest",chapter:1,light:20,dark:20,boss:"Lil' Slugger"},
@@ -38,11 +45,11 @@ const bandageMap=[
 ];
 
 const warpMap=[
- ["1-5","1-12","1-19","1-13X"],
- ["2-8","2-12","2-15","2-5X"],
- ["3-5","3-7","3-16","3-8X"],
- ["4-8","4-14","4-18","4-7X"],
- ["5-1","5-7","5-12","5-20X"],
+ [{name:"Sky Pup",found:"1-5 Holy Mountain"},{name:"The Commander!",found:"1-12 Revolve"},{name:"Hand Held Hack",found:"1-19 Intermission"},{name:"Space Boy",found:"1-13X Tommy's Condo"}],
+ [{name:"The Bootlicker!",found:"2-8 The Sabbath"},{name:"Castle Crushers",found:"2-12 Above"},{name:"The Blood Shed",found:"2-15 Gallbladder"},{name:"1977",found:"2-5X Agent Orange"}],
+ [{name:"Cartridge Dump",found:"3-5 Uptown"},{name:"Tunnel Vision",found:"3-7 Mind the Gap"},{name:"The Jump Man",found:"3-16 Mono"},{name:"Kontra",found:"3-8X Salt Crown"}],
+ [{name:"Brimstone",found:"4-8 Weibe"},{name:"The Key Master",found:"4-14 Adversary"},{name:"The Fly Guy!",found:"4-18 Boris"},{name:"MMMMMM",found:"4-7X Thistle"}],
+ [{name:"Skyscraper",found:"5-1 The Witness"},{name:"The Guy!",found:"5-7 The Fallen"},{name:"Sunshine Island",found:"5-12 10 Horns"},{name:"Meat is Death",found:"5-20X Quietus"}],
  [],[]
 ];
 
@@ -78,9 +85,9 @@ function renderWorlds(){
    const warps=warpMap[wi]||[];
    if(warps.length){
      html+='<div class="special-section"><strong>Warp Zones — '+warps.length+'</strong><div class="special-grid">';
-     warps.forEach(function(level,n){
+     warps.forEach(function(warp,n){
        const k=K("warp",wi+"-"+n);
-       html+='<label><input data-k="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'> '+level+'</label>';
+       html+='<label class="warp-entry"><input data-k="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'> <span><strong>'+warp.name+'</strong><small>Found in '+warp.found+'</small></span></label>';
      });
      html+='</div></div>';
    }
