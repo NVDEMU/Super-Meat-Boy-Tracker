@@ -157,7 +157,7 @@ function renderLevelGrid(worldIndex,type,count){
  for(let i=1;i<=count;i++){
    const id=worldIndex+"-"+type+"-"+i;
    const k=K("level",id), ak=K("aplus",id);
-   html+='<div class="level-row"><label class="check"><input id="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'><span>'+w.chapter+"-"+i+prefix+'</span></label>';
+   html+='<div class="level-row"><label class="check level-check"><input id="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'><span class="level-number">'+w.chapter+"-"+i+prefix+'</span><span class="level-done">✓ Completed</span></label>';
    html+='<label class="aplus"><input data-k="'+ak+'" type="checkbox" '+(isDone(ak)?"checked":"")+'> A+</label></div>';
  }
  return html+'</div>';
