@@ -264,7 +264,7 @@ function renderAll(){
  renderWorlds();renderGlitches();renderCharacters();
  const p=completion();
  document.getElementById("completion").textContent=p.total.toFixed(1).replace(/\.0$/,"")+"%";
- document.querySelector(".completion-ring").style.setProperty("--pct",p.total);
+ document.querySelector(".completion-ring").style.setProperty("--pct",Math.min(100,p.total));
  document.getElementById("overallBar").style.width=Math.min(100,p.total)+"%";
  document.getElementById("completedPoints").textContent=p.totalPoints.toFixed(1).replace(/\.0$/,"")+" / 376 base points";
  document.getElementById("levelsDone").textContent=p.standardDone;
