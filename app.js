@@ -15,58 +15,155 @@ function iconForName(name){let a=steamAchievements.find(function(x){return x.nam
 const psnAchievements=psnNames.map(function(name,i){return{id:"psn-"+i,name:name,description:psnDescriptions[i],platforms:["playstation"],icon:iconForName(name)};});
 const xboxAchievements=xboxNames.map(function(name,i){return{id:"xbox-"+i,name:name,description:xboxDescriptions[i],platforms:["xbox"],icon:iconForName(name)};});
 const achievements=steamAchievements.concat(psnAchievements,xboxAchievements);
-const worlds=[{name:"The Forest",levels:20},{name:"The Hospital",levels:20},{name:"The Salt Factory",levels:20},{name:"Hell",levels:20},{name:"The Rapture",levels:20},{name:"The End / Cotton Alley",levels:25}];
-const bandageMap=[
-{"4":1,"5":2,"7":1,"9":1,"11":1,"13":1,"18":1,"19":2,"20":1,"3X":1,"5X":1,"10X":1,"13X":2,"14X":1,"15X":1,"17X":1,"19X":1},
-{"2":1,"5":1,"10":1,"12":2,"13":1,"15":2,"16":1,"18":1,"20":1,"4X":1,"5X":2,"6X":1,"7X":1,"10X":1,"12X":1,"15X":1,"16X":1},
-{"1":1,"2":1,"4":1,"5":2,"7":2,"10":1,"11":1,"18":1,"20":1,"3X":1,"5X":1,"6X":1,"7X":1,"8X":2,"14X":1,"16X":1,"19X":1},
-{"2":1,"6":1,"8":2,"9":1,"13":1,"14":2,"16":1,"17":1,"20":1,"3X":1,"4X":1,"7X":2,"8X":1,"10X":1,"14X":1,"18X":1,"19X":1},
-{"1":2,"3":1,"5":1,"9":1,"12":3,"16":1,"18":1,"20":1,"4X":1,"5X":1,"8X":1,"10X":1,"11X":1,"17X":1,"18X":1,"20X":2},
-{}
+const worlds=[
+ {name:"The Forest",chapter:1,light:20,dark:20,boss:"Lil' Slugger"},
+ {name:"The Hospital",chapter:2,light:20,dark:20,boss:"C.H.A.D."},
+ {name:"The Salt Factory",chapter:3,light:20,dark:20,boss:"Brownie"},
+ {name:"Hell",chapter:4,light:20,dark:20,boss:"The Larries"},
+ {name:"The Rapture",chapter:5,light:20,dark:20,boss:"Larries Lament"},
+ {name:"The End",chapter:6,light:5,dark:5,boss:"Dr. Fetus"},
+ {name:"The Cotton Alley",chapter:7,light:20,dark:20,boss:null}
 ];
+
+// One tracker entry = one actual bandage.
+// Warp-zone bandages are separate entries (P#-#), so no normal/warp level is
+// incorrectly shown as containing multiple bandages.
+const bandageMap=[
+ ["1-4","P1-1","P1-2","1-7","1-9","1-11","1-13","1-18","P3-2","P3-3","1-20","1-3X","1-5X","1-10X","P4-2","P4-3","1-14X","1-15X","1-17X","1-19X"],
+ ["2-2","2-5","2-10","P6-1","P6-2","2-13","P7-1","P7-3","2-16","2-18","2-20","2-4X","P8-1","P8-3","2-6X","2-7X","2-10X","2-12X","2-15X","2-16X"],
+ ["3-1","3-2","3-4","P9-1","P9-3","P10-1","P10-3","3-10","3-11","3-18","3-20","3-3X","3-5X","3-6X","3-7X","P12-2","P12-3","3-14X","3-16X","3-19X"],
+ ["4-2","4-6","P13-2","P13-3","4-9","4-13","P14-2","P14-3","4-16","4-17","4-20","4-3X","4-4X","P16-2","P16-3","4-8X","4-10X","4-14X","4-18X","4-19X"],
+ ["P17-2","P17-3","5-3","5-5","5-9","5-12","P18-1","P18-2","5-16","5-18","5-20","5-4X","5-5X","5-8X","5-10X","5-11X","5-17X","5-18X","P20-1","P20-2"],
+ [],[]
+];
+
+const warpMap=[
+ ["1-5","1-12","1-19","1-13X"],
+ ["2-8","2-12","2-15","2-5X"],
+ ["3-5","3-7","3-16","3-8X"],
+ ["4-8","4-14","4-18","4-7X"],
+ ["5-1","5-7","5-12","5-20X"],
+ [],[]
+];
+
 let progress=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"),earned=JSON.parse(localStorage.getItem(ACH_KEY)||"{}");
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));} function saveAch(){localStorage.setItem(ACH_KEY,JSON.stringify(earned));} function K(t,id){return t+"-"+id;} function isDone(k){return!!progress[k];} function toggle(k){progress[k]=!progress[k];save();renderAll();}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));}
+function saveAch(){localStorage.setItem(ACH_KEY,JSON.stringify(earned));}
+function K(t,id){return t+"-"+id;}
+function isDone(k){return!!progress[k];}
+function toggle(k){progress[k]=!progress[k];save();renderAll();}
+
+function renderLevelGrid(worldIndex,type,count){
+ const w=worlds[worldIndex], prefix=type==="light"?"":"X";
+ let html='<div class="world-subhead"><h4>'+(type==="light"?"Light World":"Dark World")+'</h4><span>'+count+' levels</span></div><div class="level-grid">';
+ for(let i=1;i<=count;i++){
+   const id=worldIndex+"-"+type+"-"+i;
+   const k=K("level",id), ak=K("aplus",id);
+   html+='<div class="level-row"><label class="check"><input id="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'><span>'+w.chapter+"-"+i+prefix+'</span></label>';
+   html+='<label class="aplus"><input data-k="'+ak+'" type="checkbox" '+(isDone(ak)?"checked":"")+'> A+</label></div>';
+ }
+ return html+'</div>';
+}
+
 function renderWorlds(){
  const root=document.getElementById("worlds");
  root.innerHTML=worlds.map(function(w,wi){
-   let html='<article class="world-card"><div class="world-head"><h3>'+w.name+'</h3><span class="world-pct" id="wp-'+wi+'">0%</span></div><div class="checklist">';
-   for(let i=1;i<=w.levels;i++){let k=K("level",wi+"-"+i);html+='<div class="check"><input id="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'><label for="'+k+'">'+i+'</label></div>';}
-   html+='</div>';
-   const bm=bandageMap[wi]||{};
-   const keys=Object.keys(bm);
-   if(keys.length){
-     html+='<div class="bandage-list"><strong>Bandages — only levels containing bandages</strong><div class="bandage-grid">';
-     keys.forEach(function(level){
-       const max=bm[level], key=K("bandage-level",wi+"-"+level), value=Math.min(max,+(progress[key]||0));
-       html+='<label class="bandage-item"><span>Level '+level+' <small>🩹 '+max+'</small></span><input min="0" max="'+max+'" type="number" data-bandage-level="'+wi+'-'+level+'" value="'+value+'"><em>/ '+max+'</em></label>';
+   let html='<article class="world-card"><div class="world-head"><div><h3>Chapter '+w.chapter+' — '+w.name+'</h3><p class="chapter-note">'+w.light+' Light + '+w.dark+' Dark'+(w.boss?" + boss":"")+'</p></div><span class="world-pct" id="wp-'+wi+'">0%</span></div>';
+   html+=renderLevelGrid(wi,"light",w.light);
+   html+=renderLevelGrid(wi,"dark",w.dark);
+   if(w.boss){
+     const bk=K("boss",wi);
+     html+='<div class="special-row"><label><input data-k="'+bk+'" type="checkbox" '+(isDone(bk)?"checked":"")+'> Boss — '+w.boss+'</label></div>';
+   }
+   const warps=warpMap[wi]||[];
+   if(warps.length){
+     html+='<div class="special-section"><strong>Warp Zones — '+warps.length+'</strong><div class="special-grid">';
+     warps.forEach(function(level,n){
+       const k=K("warp",wi+"-"+n);
+       html+='<label><input data-k="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'> '+level+'</label>';
      });
      html+='</div></div>';
+   }
+   const bands=bandageMap[wi]||[];
+   if(bands.length){
+     html+='<div class="bandage-list"><strong>Bandages — 1 per listed location</strong><div class="bandage-grid">';
+     bands.forEach(function(location,n){
+       const k=K("bandage",wi+"-"+n);
+       html+='<label class="bandage-item"><input data-k="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'> <span>'+location+'</span></label>';
+     });
+     html+='</div><small class="hint">'+bands.length+' bandages in this chapter.</small></div>';
    } else {
      html+='<p class="no-bandages">No bandages in this chapter.</p>';
    }
-   html+='<div class="subchecks">';
-   ["Dark World complete","Warp zones complete","Boss complete","All A+ in chapter"].forEach(function(label,n){let type=["dark","warp","boss","a"][n],k=K(type,wi);html+='<label><input data-k="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'> '+label+'</label>';});
-   html+='</div></article>'; return html;
+   return html+'</article>';
  }).join("");
  root.querySelectorAll("#worlds .check input").forEach(function(x){x.addEventListener("change",function(){toggle(x.id);});});
  root.querySelectorAll("[data-k]").forEach(function(x){x.addEventListener("change",function(){toggle(x.dataset.k);});});
- root.querySelectorAll("[data-bandage-level]").forEach(function(x){x.addEventListener("change",function(){
-   const parts=x.dataset.bandageLevel.split("-"), wi=parts.shift(), level=parts.join("-");
-   const max=bandageMap[wi][level]||0;
-   progress[K("bandage-level",wi+"-"+level)]=Math.max(0,Math.min(max,+x.value||0));save();renderAll();
- });});
 }
-function renderGlitches(){const root=document.getElementById("glitches");root.innerHTML="";for(let i=1;i<=6;i++){let k=K("glitch",i);root.innerHTML+='<div class="check"><input id="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'><label for="'+k+'">Glitch '+i+'</label></div>';}root.querySelectorAll("input").forEach(function(x){x.addEventListener("change",function(){toggle(x.id);});});}
+
+function renderGlitches(){
+ const root=document.getElementById("glitches");
+ root.innerHTML="";
+ const names=["-1 — The Forest","-2 — The Hospital","-3 — The Salt Factory","-4 — Hell","-5 — The Rapture","-6 — The End"];
+ names.forEach(function(name,i){
+   const k=K("glitch",i+1);
+   root.innerHTML+='<div class="check"><input id="'+k+'" type="checkbox" '+(isDone(k)?"checked":"")+'><label for="'+k+'">'+name+' <small>+1%</small></label></div>';
+ });
+ root.querySelectorAll("input").forEach(function(x){x.addEventListener("change",function(){toggle(x.id);});});
+}
+
 function completion(){
- let levels=0,a=0,bandages=0;worlds.forEach(function(w,wi){for(let i=1;i<=w.levels;i++)if(isDone(K("level",wi+"-"+i)))levels++;if(isDone(K("a",wi)))a++;Object.keys(bandageMap[wi]||{}).forEach(function(level){bandages+=Math.min(bandageMap[wi][level],progress[K("bandage-level",wi+"-"+level)]||0);});});
- let glitches=0;for(let i=1;i<=6;i++)if(isDone(K("glitch",i)) )glitches++;
- return{total:Math.min(106,(levels/250)*90+(bandages/100)*4+(a/6)*6+glitches),levels:levels,bandages:bandages,a:a,glitches:glitches};
+ let standardDone=0,bosses=0,warps=0,bandages=0,aplusLight=0,aplusDark=0;
+ worlds.forEach(function(w,wi){
+   for(let i=1;i<=w.light;i++){
+     if(isDone(K("level",wi+"-light-"+i)))standardDone++;
+     if(isDone(K("aplus",wi+"-light-"+i)))aplusLight++;
+   }
+   for(let i=1;i<=w.dark;i++){
+     if(isDone(K("level",wi+"-dark-"+i)))standardDone++;
+     if(isDone(K("aplus",wi+"-dark-"+i)))aplusDark++;
+   }
+   if(w.boss && isDone(K("boss",wi)))bosses++;
+   (warpMap[wi]||[]).forEach(function(_,n){if(isDone(K("warp",wi+"-"+n)))warps++;});
+   (bandageMap[wi]||[]).forEach(function(_,n){if(isDone(K("bandage",wi+"-"+n)))bandages++;});
+ });
+ let glitches=0;
+ for(let i=1;i<=6;i++)if(isDone(K("glitch",i)))glitches++;
+
+ // Game-style completion weights:
+ // 250 standard Light/Dark levels = 80%
+ // 20 Warp Zones = 10%
+ // 6 chapter bosses = 6%
+ // 100 bandages = 4%
+ // 6 glitch levels = +6% extra
+ // A+ ranks do NOT directly add completion; Light A+ unlocks Dark World access.
+ const base=(standardDone/250)*80+(warps/20)*10+(bosses/6)*6+(bandages/100)*4;
+ const total=Math.min(106,base+glitches);
+ return{total:total,standardDone:standardDone,bandages:bandages,warps:warps,bosses:bosses,glitches:glitches,aplusLight:aplusLight,aplusDark:aplusDark};
 }
+
 function renderAll(){
- renderGlitches();let p=completion();document.getElementById("completion").textContent=Math.round(p.total)+"%";document.querySelector(".completion-ring").style.setProperty("--pct",p.total);document.getElementById("overallBar").style.width=(p.total/106*100)+"%";document.getElementById("completedPoints").textContent=Math.round(p.total)+" / 106 points";document.getElementById("levelsDone").textContent=p.levels;document.getElementById("bandagesDone").textContent=p.bandages;document.getElementById("aPlusDone").textContent=p.a;document.getElementById("completionStatus").textContent=p.total>=106?"106% — Golden God":"Progress in the making";
- worlds.forEach(function(w,wi){let done=0;for(let i=1;i<=w.levels;i++)if(isDone(K("level",wi+"-"+i)))done++;document.getElementById("wp-"+wi).textContent=Math.round(done/w.levels*100)+"%";});
- document.getElementById("glitchPct").textContent=Math.round(p.glitches/6*100)+"%";renderAchievements();
+ renderWorlds();renderGlitches();
+ const p=completion();
+ document.getElementById("completion").textContent=p.total.toFixed(1).replace(/\.0$/,"")+"%";
+ document.querySelector(".completion-ring").style.setProperty("--pct",p.total);
+ document.getElementById("overallBar").style.width=(p.total/106*100)+"%";
+ document.getElementById("completedPoints").textContent=p.total.toFixed(1).replace(/\.0$/,"")+" / 106%";
+ document.getElementById("levelsDone").textContent=p.standardDone;
+ document.getElementById("bandagesDone").textContent=p.bandages;
+ document.getElementById("aPlusDone").textContent=p.aplusLight;
+ document.getElementById("completionStatus").textContent=p.total>=106?"106% — Golden God":"Progress in the making";
+ worlds.forEach(function(w,wi){
+   let done=0,total=w.light+w.dark+(w.boss?1:0);
+   for(let i=1;i<=w.light;i++)if(isDone(K("level",wi+"-light-"+i)))done++;
+   for(let i=1;i<=w.dark;i++)if(isDone(K("level",wi+"-dark-"+i)))done++;
+   if(w.boss&&isDone(K("boss",wi)))done++;
+   document.getElementById("wp-"+wi).textContent=Math.round(done/total*100)+"%";
+ });
+ document.getElementById("glitchPct").textContent=Math.round(p.glitches/6*100)+"%";
+ renderAchievements();
 }
+
 function platformName(p){return p==="steam"?"Steam":p==="playstation"?"PlayStation":"Xbox 360";}
 function renderAchievements(){
  let platform=document.getElementById("platformFilter").value,status=document.getElementById("achievementStatus").value;
