@@ -119,9 +119,10 @@ function renderCharacters(){
    b.addEventListener("click",function(){
      const name=cFromKey(b.dataset.character);
      if(platform==="all"){
-       characterData.find(function(x){return x.name===name;}).versions.forEach(function(v){
-         const k=K("character",v+"-"+name);
-         progress[k]=!characterUnlocked(cByName(name));
+       const character=cByName(name);
+       const target=!characterUnlocked(character);
+       character.versions.forEach(function(v){
+         progress[K("character",v+"-"+name)]=target;
        });
        save();renderAll();
      }else{
